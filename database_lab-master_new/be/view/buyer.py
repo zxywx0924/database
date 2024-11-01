@@ -56,6 +56,29 @@ def book_search():
     return jsonify({"message": message}), code
 
 
+@bp_buyer.route("/search_book_advanced", methods=["POST"])
+def book_search_advanced():
+    keyword = request.json.get("keyword")
+    store_id = request.json.get("store_id")
+    author = request.json.get("author")
+    tags = request.json.get("tags")
+    page = request.json.get("page", 1)
+    page_size = request.json.get("page_size", 20)
+    sort = request.json.get("sort", "relevance")
+
+    b = Buyer()
+    code, message, results = b.book_search_advanced(
+        keyword=keyword,
+        store_id=store_id,
+        author=author,
+        tags=tags,
+        page=page,
+        page_size=page_size,
+        sort=sort,
+    )
+    return jsonify({"message": message, "results": results}), code
+
+
 # 接受删除订单请求并调用后端逻辑实现
 @bp_buyer.route("/delete_order", methods=["POST"])
 def delete_order():

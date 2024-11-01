@@ -17,6 +17,20 @@ class Store:
         self.db.user.create_index([("user_id", pymongo.ASCENDING)], unique=True)
         self.db.user_store.create_index([("user_id", pymongo.ASCENDING), ("store_id", pymongo.ASCENDING)], unique=True)
         self.db.store.create_index([("store_id", pymongo.ASCENDING), ("book_id", pymongo.ASCENDING)], unique=True)
+        # Search-related indexes to speed up multi-field queries
+        self.db.store.create_index([("book_title", pymongo.ASCENDING)])
+        self.db.store.create_index([("book_author", pymongo.ASCENDING)])
+        self.db.store.create_index([("book_tags", pymongo.ASCENDING)])  # multikey on array
+        # Text index for keyword search across title/author/tags
+        try:
+            self.db.store.create_index([
+                ("book_title", pymongo.TEXT),
+                ("book_author", pymongo.TEXT),
+                ("book_tags", pymongo.TEXT),
+            ], name="store_text_idx")
+        except Exception:
+            # Ignore if text index already exists or unsupported
+            pass
         self.db.new_order.create_index([("order_id", pymongo.ASCENDING)], unique=True)
         self.db.new_order_detail.create_index([("order_id", pymongo.ASCENDING), ("book_id", pymongo.ASCENDING)],
                                               unique=True)

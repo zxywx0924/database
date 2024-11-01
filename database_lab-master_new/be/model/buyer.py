@@ -150,6 +150,65 @@ class Buyer(db_conn.DBConn):
 
         return 200, "ok"
 
+    # 多字段高级检索（关键词 + 过滤 + 分页 + 排序）
+    def book_search_advanced(
+            self,
+            keyword: str = None,
+            store_id: str = None,
+            author: str = None,
+            tags: list = None,
+            page: int = 1,
+            page_size: int = 20,
+            sort: str = "relevance"
+    ) -> (int, str, list):
+        try:
+            page = max(1, int(page))
+            page_size = max(1, min(100, int(page_size)))
+
+            query = {}
+            projection = {}
+            sort_spec = None
+
+            if keyword:
+                # Use text index when available
+                query["$text"] = {"$search": keyword}
+                projection["score"] = {"$meta": "textScore"}
+                if sort == "relevance":
+                    sort_spec = [("score", {"$meta": "textScore"})]
+
+            if store_id:
+                query["store_id"] = store_id
+            if author:
+                # case-insensitive match on author
+                query["book_author"] = {"$regex": author, "$options": "i"}
+            if tags:
+                # any tag match for broader recall
+                query["book_tags"] = {"$in": tags}
+
+            # Fallback sort
+            if sort_spec is None:
+                if sort == "title_asc":
+                    sort_spec = [("book_title", 1)]
+                elif sort == "title_desc":
+                    sort_spec = [("book_title", -1)]
+                else:
+                    sort_spec = [("book_title", 1)]
+
+            cursor = self.conn.store_col.find(query, projection)
+            # Apply sort
+            if sort_spec:
+                cursor = cursor.sort(sort_spec)
+
+            # Pagination
+            cursor = cursor.skip((page - 1) * page_size).limit(page_size)
+
+            results = list(cursor)
+
+            return 200, "ok", results
+
+        except BaseException as e:
+            return 530, "{}".format(str(e)), []
+
     # 删除订单
     def delete_order(self, user_id, order_id) -> (int, str):
         try:

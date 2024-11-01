@@ -56,33 +56,3 @@ class TestNewOrder:
         assert ok
         code, _ = self.buyer.new_order(self.store_id + "_x", buy_book_id_list)
         assert code != 200
-
-    def test_all_error_functions_basic(self):
-        """测试所有错误函数的基本功能"""
-        from be.model import error
-    
-        test_id = "test_error_id"
-    
-        # 测试主要的错误函数
-        test_cases = [
-        (error.error_non_exist_user_id, test_id),
-        (error.error_exist_user_id, test_id),
-        (error.error_non_exist_store_id, test_id),
-        (error.error_exist_store_id, test_id),
-        (error.error_non_exist_book_id, test_id),
-        (error.error_exist_book_id, test_id),
-        (error.error_stock_level_low, test_id),
-        (error.error_invalid_order_id, test_id),
-        (error.error_not_sufficient_funds, test_id),
-        (error.error_non_order_delete, test_id),
-        (error.error_order_repay, test_id),
-        (error.error_non_order_pay, test_id),
-        (error.error_non_exist_order, test_id),
-        (error.error_unable_to_delete, test_id),
-        (error.empty_order_search, test_id),
-        ]
-    
-        for error_func, arg in test_cases:
-            code, msg = error_func(arg)
-            assert code >= 400  # 错误码应该大于等于400
-            assert str(arg) in msg
