@@ -1,0 +1,56 @@
+
+import os
+import pymongo
+
+
+class Store:
+    def __init__(self, db_url, db_name):
+        self.client = pymongo.MongoClient(db_url)
+        self.db = self.client.get_database(db_name)
+        self.user_col = self.db['user']
+        self.user_store_col = self.db['user_store']
+        self.store_col = self.db['store']
+        self.new_order_col = self.db['new_order']
+        self.new_order_detail_col = self.db['new_order_detail']
+
+    def init_collections(self):
+        self.db.user.create_index([("user_id", pymongo.ASCENDING)], unique=True)
+        self.db.user_store.create_index([("user_id", pymongo.ASCENDING), ("store_id", pymongo.ASCENDING)], unique=True)
+        self.db.store.create_index([("store_id", pymongo.ASCENDING), ("book_id", pymongo.ASCENDING)], unique=True)
+        # Search-related indexes to speed up multi-field queries
+        self.db.store.create_index([("book_title", pymongo.ASCENDING)])
+        self.db.store.create_index([("book_author", pymongo.ASCENDING)])
+        self.db.store.create_index([("book_tags", pymongo.ASCENDING)])  # multikey on array
+        # Text index for keyword search across title/author/tags
+        try:
+            self.db.store.create_index([
+                ("book_title", pymongo.TEXT),
+                ("book_author", pymongo.TEXT),
+                ("book_tags", pymongo.TEXT),
+            ], name="store_text_idx")
+        except Exception:
+            # Ignore if text index already exists or unsupported
+            pass
+        self.db.new_order.create_index([("order_id", pymongo.ASCENDING)], unique=True)
+        self.db.new_order_detail.create_index([("order_id", pymongo.ASCENDING), ("book_id", pymongo.ASCENDING)],
+                                              unique=True)
+
+
+database_instance: Store = None
+
+
+def init_database(db_url, db_name):
+    global database_instance
+    database_instance = Store(db_url, db_name)
+    database_instance.init_collections()
+
+
+def get_db_conn():
+    global database_instance
+    return database_instance
+
+
+# 初始化数据库
+init_database("mongodb://localhost:27017", "bookstoredb")  
+db_conn = get_db_conn()
+
