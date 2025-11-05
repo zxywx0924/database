@@ -1,9 +1,14 @@
+[TOC]
+
+
+
 ## 当代数据管理系统项目 : Bookstore
 
 <table><tr><td>课程名称：当代数据管理系统</td><td>项目名称：
 bookstore</td><td>指导老师：周烜</td></tr><tr><td>姓名：张欣扬</td><td>学号：
 10235501413</td><td>负责用户权限接口（注册登录等）+ 订单状态查询取消 + 搜索图书功能 + 快速索引功能</td></tr><tr><td>姓名：贾馨雨</td><td>学号：
     10235501437</td><td>负责买家用户接口（充值下单等）+ 卖家用户接口（创建店铺等）+ 发货收货流程 + 覆盖率提升</td></tr></table>
+
 
 
 ​	我们基于Flask和MongoDB构建了一个完整的在线书店系统，完成了从SQLite到MongoDB的数据迁移，设计了合理的数据库结构，并通过建立复合索引优化了查询性能。系统实现了用户注册登录、图书搜索、下单购买、支付结算、发货收货等完整业务流程，订单系统支持状态跟踪和超时自动取消，搜索功能支持多条件查询。测试覆盖率达到94%，通过新增完整的错误处理测试，覆盖了重复支付、数据库操作失败、授权校验等异常场景，提升了系统的健壮性和可靠性。除了完成要求的所有功能之外，我们还通过索引优化提升了系统性能。
@@ -62,6 +67,7 @@ bookstore</td><td>指导老师：周烜</td></tr><tr><td>姓名：张欣扬</td>
   店铺商品表存储各店铺的商品库存和商品信息，每个文档代表一个店铺中的特定商品，包含完整的商品信息和库存数量。
 
   store_id和book_id设置为索引，支持高效的店铺商品查询和库存管理。booktags字段采用数组形式存储多个标签，便于商品分类和检索。
+
 ```txt
 { 
 	"_id": "objectId", // MongoDB 自动生成的唯一标识符
@@ -91,7 +97,7 @@ bookstore</td><td>指导老师：周烜</td></tr><tr><td>姓名：张欣扬</td>
 
 ####  be/model后端逻辑代码
 
-#### buyer:
+#### buyer
 
 - ##### init
 
@@ -366,13 +372,13 @@ def receive(self, user_id: str, store_id: str, order_id: str) -> (int, str):
     return 200, "ok"
 ```
 
-####  user: 
+####  user
 
 User 类负责处理用户身份验证与账户管理，为系统提供安全的访问控制。该类通过 JWT 令牌机制管理用户会话，并封装了完整的用户生命周期操作。其初始化过程建立了必要的数据库连接。核心的令牌验证方法 `__check_token` 负责解密传入的 JWT 令牌，并校验其签名有效性与时间戳，确保会话安全。
 
 在用户账户管理方面，`register` 方法执行新用户注册，在插入新用户文档前会先行检查用户 ID 是否已存在，以此保证唯一性。`login` 方法在验证用户密码正确后，会生成一个新的 JWT 令牌并更新至数据库，完成登录流程。与之对应的 `logout` 方法则通过将用户令牌替换为一个新生成的无效令牌，使其原会话失效。系统同时提供了关键的安全维护功能。`check_password` 用于核验密码是否正确`change_password` 方法要求用户提供旧密码以通过身份验证，随后才允许更新为新密码，并同时刷新用户令牌。而 `unregister` 方法在执行最终的用户文档删除前，同样会进行严格的密码确认，确保账户注销操作的安全性。
 
-##### 初始化：
+##### 初始化
 
 ```python
 def __init__(self):
@@ -539,7 +545,7 @@ def change_password(self, user_id: str, old_password: str, new_password: str) ->
         return 530, str(e)
 ```
 
-#### seller:
+#### seller
 
 Seller 类为卖家提供了店铺运营所需的核心功能，包括商品管理、库存维护和订单处理。
 
@@ -549,7 +555,7 @@ Seller 类为卖家提供了店铺运营所需的核心功能，包括商品管�
 
 订单处理功能包含查询与发货两个关键操作。`search_order` 方法首先会清理系统中所有超时未支付的订单，随后基于卖家所拥有的店铺 ID 列表，检索出与该卖家相关的所有订单。`deliver` 方法负责执行发货流程，它会严格校验订单状态，确保订单处于“已支付”状态且未被发货后，才将订单状态更新为“已发货”，从而推动订单进入下一个环节。
 
-##### add_book: 
+##### add_book
 
 检查用户和店铺是否存在，以及书籍是否已存在。创建书籍数据字典。将书籍信息插入到 MongoDB 的 store_col 集合中。
 
@@ -579,7 +585,7 @@ def add_book(self, user_id: str, store_id: str, book_id: str, book_title: str, b
 	# 成功添加书籍，返回状态码200和消息
 ```
 
-##### add_stock_level: 
+##### add_stock_level
 
 检查用户、店铺和书籍是否存在。使用 MongoDB 的 inc 操作符更新库存数量。
 
@@ -605,7 +611,7 @@ def add_stock_level(self, user_id: str, store_id: str, book_id: str,add_stock_le
     return 200, "ok"
 ```
 
-##### createStore：
+##### createStore
 
 检查用户是否存在，且店铺ID是否已存在。将店铺信息插入到userstore_col集合中。
 
@@ -627,7 +633,7 @@ def create_store(self, user_id: str, store_id: str) -> (int, str):
     return 200, "ok"
 ```
 
-##### search_order：
+##### search_order
 
 遍历当前订单，删除超时未支付的订单。获取卖家名下所有店铺的ID。查找与这些店铺相关的订单ID。
 
@@ -654,7 +660,7 @@ self.conn.new_order_col.find({"store_id": {"$in": seller_store_ids}}, {"order_id
     return 200, "ok"
 ```
 
-##### deliver: 
+##### deliver
 
 检查订单是否存在，用户和店铺是否有效。检查订单的支付状态，如果未支付或已发货，返回相应错误。更新订单状态为“已发货”。
 
@@ -682,7 +688,7 @@ def deliver(self, user_id: str, store_id: str, order_id: str) -> (int, str):
 
 #### be/view: 访问后端接口
 
-#####  buyer:
+#####  buyer
 
 ##### 新建订单接口(/buyer/new_order)
 
@@ -811,7 +817,7 @@ def receive():
     return jsonify({'message': message}), code
 ```
 
-#### Auth:
+#### Auth
 
 ##### Login
 
@@ -861,7 +867,7 @@ def logout():
 - 实现:
   - 从请求的JSON数据中获取user_id和password。  
   - 创建 User 实例，并调用 register 方法进行注册。
-  -  返回注册结果的消息。
+  - 返回注册结果的消息。
 
 ```python
 @bp_auth-route("/register", methods=['POST'])  
@@ -1001,7 +1007,7 @@ def search_order():
 ##### deliver
 
 - 功能：发货处理。  
--  实现：
+- 实现：
   - 从请求的JSON数据中获取user_id、order_id和store_id。  
   - 创建Seller实例，并调用deliver方法更新订单状态为已发货。  
   - 返回发处理结果的消息和状态码。
@@ -1021,7 +1027,7 @@ def deliver():
 
 ####  User:测试使用者各个接口
 
-##### test_login:
+##### test_login
 
 ##### test.ok
 
@@ -1223,7 +1229,7 @@ def test_error_user_id(self):
 * 调用register_new Seller函数，注册新卖家并保存返回的卖家对象。  
 
 - 使用 create_STORE 方法创建新商店，传入 store_id。  
-验证返回的状态码应为200（表示商店创建成功）。
+  验证返回的状态码应为200（表示商店创建成功）。
 
 ```python
 def test.ok(self):
@@ -2054,7 +2060,7 @@ self.db.store.create_index([("book_tags", pymongo.ASCENDING)])
 **作用：**
 
 - 加速按书名、作者、标签的精确查询
-- `book_tags` 使用 **多键索引（multikey index）**，支持数组字段的高效查询
+- `book_tags` 使用 **多键索引**，支持数组字段的高效查询
 
 ###### 复合文本索引（全文搜索）
 
@@ -2071,7 +2077,7 @@ self.db.store.create_index([
 
 - 在 `book_title`、`book_author`、`book_tags` 三个字段上创建**复合文本索引**
 - 支持跨字段的关键词全文搜索
-- 自动计算相关性分数（textScore）
+- 自动计算相关性分数
 
 ###### 唯一索引（数据完整性）
 
@@ -2136,7 +2142,7 @@ if keyword:
 
 1. 使用 `$text` 查询操作符触发文本索引
 2. 在 `book_title`、`book_author`、`book_tags` 三个字段中搜索关键词
-3. MongoDB 自动计算相关性分数（textScore）
+3. MongoDB 自动计算相关性分数
 4. 按相关性分数排序，最相关的结果排在前面
 
 ###### 组合查询（文本索引 + 其他条件）
@@ -2366,7 +2372,7 @@ def test_all_error_functions_basic(self):
 
 
 
-## 总结:
+## 总结
 
 ​	本次实验项目，我们设计并实现了一个基于 Flask 和 MongoDB 的完整在线书店系统。项目不仅完成了从原有 SQLite 到文档数据库 MongoDB 的平滑迁移，更通过数据库设计与索引优化，构建了一个高性能、高可用的图书购物平台。
 
