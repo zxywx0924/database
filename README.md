@@ -2345,11 +2345,21 @@ def test_all_error_functions_basic(self):
 
 ### 新增功能测试
 
-<img src="C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104121500488.png" alt="image-20251104121500488" style="zoom:200%;" />
+<img src="C:\Users\32535\Desktop\数据库\实验报告\17f1c4add84f49249406b3c607e602d.png" alt="17f1c4add84f49249406b3c607e602d" style="zoom: 55%;" />
+
+<img src="C:\Users\32535\Desktop\数据库\实验报告\be3eacfd521e935cd6416a44aa74194.png" alt="be3eacfd521e935cd6416a44aa74194" style="zoom:67%;" />
+
+<img src="C:\Users\32535\Desktop\数据库\实验报告\b961610d98b6810d5ec9c254c437d73d.png" alt="b961610d98b6810d5ec9c254c437d73d" style="zoom:67%;" />
+
+<img src="C:\Users\32535\Desktop\数据库\实验报告\d7203ca6eafe280d33994565c340953.png" alt="d7203ca6eafe280d33994565c340953" style="zoom:62%;" />
+
+
 
 ### 测试覆盖率
 
-![image-20251104124352501](C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104124352501.png)
+
+
+<img src="C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104124352501.png" alt="image-20251104124352501" style="zoom:65%;" />
 
 
 
@@ -2362,13 +2372,13 @@ def test_all_error_functions_basic(self):
 
 **例如：**
 
-![image-20251104185139027](C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104185139027.png)
-
-<img src="C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104185242051.png" alt="image-20251104185242051" style="zoom:75%;" />
-
 
 
 ![image-20251104165009317](C:\Users\32535\AppData\Roaming\Typora\typora-user-images\image-20251104165009317.png)
+
+
+
+![c249686cc4c4d74c86a0412befa02f3](C:\Users\32535\Desktop\数据库\实验报告\c249686cc4c4d74c86a0412befa02f3.jpg)
 
 
 
